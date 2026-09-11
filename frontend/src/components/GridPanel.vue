@@ -528,6 +528,28 @@ const effectiveEngine = computed({
 const searchText = ref("");
 const searchInputRef = ref<HTMLInputElement | null>(null);
 
+// --- 搜索引擎图标切换：点击图标循环切换到下一个引擎 ---
+const currentEngine = computed(() =>
+  engines.value.find((e) => e.key === effectiveEngine.value),
+);
+const selectNextEngine = () => {
+  const list = engines.value;
+  if (!list.length) return;
+  const idx = list.findIndex((e) => e.key === effectiveEngine.value);
+  const next = list[(idx + 1) % list.length];
+  if (next) effectiveEngine.value = next.key;
+};
+const engineFallbackColor = (key: string) => {
+  const colors: Record<string, string> = {
+    google: "#4285F4",
+    bing: "#008373",
+    baidu: "#2932E1",
+    duckduckgo: "#DE5833",
+    sogou: "#FB6E42",
+  };
+  return colors[key] || "#6b7280";
+};
+
 const hexToRgb = (hex: string) => {
   let h = hex.trim();
   if (h.startsWith("#")) h = h.slice(1);
@@ -3127,11 +3149,11 @@ onUnmounted(() => {
 
           <div
             v-if="checkVisible(store.widgets.find((w) => w.id === 'w5'))"
-            class="w-full xl:absolute xl:left-1/2 xl:-translate-x-1/2 z-50 transition-all duration-300"
-            :class="isWideLayout ? 'xl:w-[32rem]' : 'xl:w-64'"
+            class="w-full xl:w-auto xl:flex-1 xl:flex xl:justify-center xl:px-6 xl:min-w-0 z-50 transition-all duration-300"
           >
             <form
               class="mx-auto shadow-lg hover:shadow-xl transition-shadow rounded-full bg-white/90 backdrop-blur-md border border-white/40 flex items-center p-1 flatnas-search-form"
+              :class="isWideLayout ? 'xl:max-w-[56rem]' : 'xl:max-w-[36rem]'"
               :style="{
                 width: '100%',
                 height: '41px',
@@ -3142,6 +3164,28 @@ onUnmounted(() => {
               @submit.prevent="doSearch"
               action="."
             >
+              <div class="flex-shrink-0">
+                <button
+                  type="button"
+                  aria-label="切换搜索引擎"
+                  :title="`当前：${currentEngine?.label || '搜索'}，点击切换下一个引擎`"
+                  class="h-[33px] w-[33px] rounded-full flex items-center justify-center overflow-hidden border border-gray-200 bg-white/70 hover:bg-white hover:shadow-sm transition-all"
+                  @click.stop="selectNextEngine"
+                >
+                  <img
+                    v-if="currentEngine?.icon"
+                    :src="currentEngine.icon"
+                    :alt="currentEngine.label"
+                    class="h-[21px] w-[21px] object-contain"
+                  />
+                  <span
+                    v-else
+                    class="text-xs font-bold"
+                    :style="{ color: engineFallbackColor(currentEngine?.key || '') }"
+                    >{{ (currentEngine?.label || "搜").slice(0, 1) }}</span
+                  >
+                </button>
+              </div>
               <input
                 ref="searchInputRef"
                 id="main-search-input"
@@ -3154,23 +3198,11 @@ onUnmounted(() => {
                 aria-label="搜索框"
                 autocomplete="off"
                 autofocus
-                class="h-full pl-6 pr-4 rounded-full bg-transparent border-0 outline-none flatnas-search-input"
-                :style="{ width: 'calc(100% - 33.75%)' }"
+                class="h-full pl-3 pr-4 flex-1 min-w-0 rounded-full bg-transparent border-0 outline-none flatnas-search-input"
                 :placeholder="
                   (engines.find((e) => e.key === effectiveEngine)?.label || '搜索') + ' 搜索...'
                 "
               />
-              <div class="flex items-center justify-end" :style="{ width: '33.75%' }">
-                <select
-                  v-model="effectiveEngine"
-                  aria-label="搜索引擎"
-                  class="h-[34px] px-3 py-0 bg-transparent rounded-full border border-gray-200 focus:border-blue-400 outline-none flatnas-search-select"
-                  :style="{ width: 'calc(100%)', fontSize: '15px' }"
-                  @click.stop
-                >
-                  <option v-for="e in engines" :key="e.key" :value="e.key">{{ e.label }}</option>
-                </select>
-              </div>
             </form>
           </div>
 
@@ -4379,8 +4411,7 @@ onUnmounted(() => {
 .shadow-text {
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
 }
-.flatnas-search-input,
-.flatnas-search-select {
+.flatnas-search-input {
   color: var(--flatnas-search-text-color, #111827);
 }
 .flatnas-search-input::placeholder {
