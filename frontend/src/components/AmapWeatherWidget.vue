@@ -310,7 +310,7 @@ const saveConfig = async () => {
   props.widget.data.city = configForm.value.city;
   // eslint-disable-next-line vue/no-mutating-props
   props.widget.data.apiKey = configForm.value.apiKey;
-  store.markDirty();
+  store.markDirtyAndSave();
   isConfiguring.value = false;
   await store.saveSingleWidget(props.widget.id, {
     data: props.widget.data,

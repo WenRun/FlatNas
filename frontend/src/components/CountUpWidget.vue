@@ -67,7 +67,7 @@ const saveConfig = async () => {
       w.data.pauseStartTime = null;
       w.data.isRunning = false;
     }
-    store.markDirty();
+    store.markDirtyAndSave();
     calculate();
   }
   showConfig.value = false;
@@ -264,7 +264,7 @@ const toggleTimer = () => {
     }
     w.data.isRunning = true;
   }
-  store.markDirty();
+  store.markDirtyAndSave();
   calculate(); // Immediate update
 };
 
@@ -275,7 +275,7 @@ const resetTimer = () => {
   w.data.isRunning = false;
   w.data.totalPauseDuration = 0;
   w.data.pauseStartTime = null;
-  store.markDirty();
+  store.markDirtyAndSave();
   calculate();
 };
 
