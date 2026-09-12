@@ -166,3 +166,6 @@ gui-test-screenshots
 LOG.md
 /server/data/
 /.idea/
+
+# transfer runtime records
+/server/doc/transfer/
