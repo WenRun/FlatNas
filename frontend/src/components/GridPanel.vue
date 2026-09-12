@@ -18,6 +18,7 @@ import { useMainStore } from "../stores/main";
 import { useWallpaperRotation } from "../composables/useWallpaperRotation";
 import { useDevice } from "../composables/useDevice";
 import { useIconPreloader } from "../composables/useIconPreloader";
+import { useAdminUnlock } from "../composables/useAdminUnlock";
 import { generateLayout, type GridLayoutItem } from "../utils/gridLayout";
 import type { NavItem, WidgetConfig, NavGroup } from "@/types";
 import OverlayMotion from "@/components/base/OverlayMotion.vue";
@@ -82,6 +83,7 @@ const FileTransferWidget = loadAsync(() => import("./FileTransferWidget.vue"));
 const SizeSelector = loadAsync(() => import("./SizeSelector.vue"));
 
 const store = useMainStore();
+const { unlocked: adminUnlocked } = useAdminUnlock();
 const { apiUpdateError, resetError } = useWallpaperRotation();
 const { deviceKey, isMobile } = useDevice(toRef(store.appConfig, "deviceMode"));
 const { width, height } = useWindowSize();
@@ -3065,6 +3067,7 @@ onUnmounted(() => {
               :class="store.appConfig.hideHeaderOnMobile ? 'hidden xl:flex' : 'flex'"
             >
               <button
+                v-if="adminUnlocked"
                 @click="openSettings"
                 class="xl:hidden w-6 h-6 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center transition-all"
               >
@@ -3082,7 +3085,7 @@ onUnmounted(() => {
                 </svg>
               </button>
               <button
-                v-if="store.isLogged"
+                v-if="store.isLogged && adminUnlocked"
                 @click="toggleEditMode"
                 class="xl:hidden px-3 h-6 rounded-full text-[10px] font-bold transition-all"
                 :class="
@@ -3216,6 +3219,7 @@ onUnmounted(() => {
               class="mr-auto xl:mr-0 pointer-events-auto"
             />
             <button
+              v-if="adminUnlocked"
               @click="openSettings"
               class="hidden xl:flex pointer-events-auto rounded-full text-white items-center justify-center backdrop-blur transition-all w-8 h-8 xl:w-10 xl:h-10 bg-transparent xl:bg-white/20 xl:hover:bg-white/40 border-0 xl:border xl:border-white/20 shadow-none xl:shadow-sm"
             >
@@ -3233,7 +3237,7 @@ onUnmounted(() => {
               </svg>
             </button>
             <button
-              v-if="store.isLogged"
+              v-if="store.isLogged && adminUnlocked"
               @click="toggleEditMode"
               class="hidden xl:block pointer-events-auto rounded-lg text-sm font-medium transition-all"
               :class="
