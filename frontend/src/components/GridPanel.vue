@@ -4160,14 +4160,22 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <!-- Center: Custom HTML -->
-        <div class="flex-1 flex justify-center px-4">
+        <!-- Center: Custom HTML + ICP 备案号 -->
+        <div class="flex-1 flex flex-col items-center justify-center gap-1 px-4">
           <div
             v-if="store.appConfig.footerHtml"
             v-html="sanitizedFooterHtml"
             class="text-center opacity-60"
             :class="store.appConfig.background ? 'text-white shadow-text' : 'text-gray-500'"
           ></div>
+          <a
+            href="https://beian.miit.gov.cn/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="hover:opacity-100 transition-opacity select-none"
+            :class="store.appConfig.background ? 'text-white/60 shadow-text' : 'text-gray-400'"
+            >湘ICP备18005473号-1</a
+          >
         </div>
 
         <!-- Right: Quote -->
